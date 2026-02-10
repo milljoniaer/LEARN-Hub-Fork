@@ -1,4 +1,4 @@
-package com.learnhub.controller;
+package com.learnhub.activitymanagement.controller;
 
 import com.learnhub.dto.response.ErrorResponse;
 import com.learnhub.dto.response.MessageResponse;
