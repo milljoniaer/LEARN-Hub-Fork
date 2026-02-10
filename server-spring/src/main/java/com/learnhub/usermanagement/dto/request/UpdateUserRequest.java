@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.dto.request;
+package com.learnhub.usermanagement.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;

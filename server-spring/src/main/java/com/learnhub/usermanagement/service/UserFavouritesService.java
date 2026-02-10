@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.service;
+package com.learnhub.usermanagement.service;
 
 import com.learnhub.usermanagement.entity.UserFavourites;
 import com.learnhub.usermanagement.repository.UserFavouritesRepository;

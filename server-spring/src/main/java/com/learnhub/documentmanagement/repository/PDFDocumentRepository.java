@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.repository;
+package com.learnhub.documentmanagement.repository;
 
 import com.learnhub.documentmanagement.entity.PDFDocument;
 import org.springframework.data.jpa.repository.JpaRepository;

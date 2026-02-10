@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.dto.response;
+package com.learnhub.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

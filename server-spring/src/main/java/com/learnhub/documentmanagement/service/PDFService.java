@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.service;
+package com.learnhub.documentmanagement.service;
 
 import com.learnhub.activitymanagement.dto.response.LessonPlanInfoResponse;
 import com.learnhub.documentmanagement.entity.PDFDocument;

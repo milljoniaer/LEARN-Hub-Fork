@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.controller;
+package com.learnhub.usermanagement.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnhub.dto.response.ErrorResponse;

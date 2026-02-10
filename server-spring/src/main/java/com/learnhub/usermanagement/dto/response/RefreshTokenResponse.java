@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.dto.response;
+package com.learnhub.usermanagement.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

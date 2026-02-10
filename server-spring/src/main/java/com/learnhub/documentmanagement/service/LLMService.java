@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.service;
+package com.learnhub.documentmanagement.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnhub.config.OllamaConfig;

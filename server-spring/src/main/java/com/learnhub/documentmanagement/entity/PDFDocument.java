@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.entity;
+package com.learnhub.documentmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

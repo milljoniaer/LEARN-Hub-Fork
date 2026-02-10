@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.dto.request;
+package com.learnhub.usermanagement.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

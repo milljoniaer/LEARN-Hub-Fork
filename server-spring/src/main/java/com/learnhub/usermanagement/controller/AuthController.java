@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.controller;
+package com.learnhub.usermanagement.controller;
 
 import com.learnhub.usermanagement.dto.request.CreateUserRequest;
 import com.learnhub.usermanagement.dto.request.LoginRequest;

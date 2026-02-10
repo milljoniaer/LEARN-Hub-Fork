@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.repository;
+package com.learnhub.usermanagement.repository;
 
 import com.learnhub.usermanagement.entity.UserSearchHistory;
 import org.springframework.data.domain.Pageable;

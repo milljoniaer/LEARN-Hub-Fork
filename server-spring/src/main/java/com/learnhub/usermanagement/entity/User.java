@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.entity;
+package com.learnhub.usermanagement.entity;
 
 import com.learnhub.usermanagement.entity.enums.UserRole;
 import jakarta.persistence.*;

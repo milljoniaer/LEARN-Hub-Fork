@@ -1,4 +1,4 @@
-package com.learnhub.activitymanagement.controller;
+package com.learnhub.documentmanagement.controller;
 
 import com.learnhub.dto.response.ErrorResponse;
 import com.learnhub.documentmanagement.entity.PDFDocument;
