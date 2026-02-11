@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -118,7 +119,7 @@ public class AuthService {
         return String.format("%06d", random.nextInt(1000000));
     }
 
-    private void saveVerificationCode(Long userId, String code) {
+    private void saveVerificationCode(UUID userId, String code) {
         // Delete old codes for this user
         verificationCodeRepository.deleteByUserId(userId);
 
@@ -141,7 +142,7 @@ public class AuthService {
         return response;
     }
 
-    public UserResponse getUserById(Long userId) {
+    public UserResponse getUserById(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
         return mapToUserResponse(user);
@@ -185,7 +186,7 @@ public class AuthService {
     }
 
     @Transactional
-    public UserResponse updateUser(Long userId, String email, String firstName, String lastName, String roleStr, String password) {
+    public UserResponse updateUser(UUID userId, String email, String firstName, String lastName, String roleStr, String password) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -224,7 +225,7 @@ public class AuthService {
     }
 
     @Transactional
-    public boolean deleteUser(Long userId, Long currentUserId) {
+    public boolean deleteUser(UUID userId, UUID currentUserId) {
         // Prevent admin from deleting themselves
         if (userId.equals(currentUserId)) {
             throw new RuntimeException("Cannot delete your own account");
@@ -243,7 +244,7 @@ public class AuthService {
     }
 
     @Transactional
-    public UserResponse updateProfile(Long userId, String email, String firstName, String lastName, String password) {
+    public UserResponse updateProfile(UUID userId, String email, String firstName, String lastName, String password) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -277,7 +278,7 @@ public class AuthService {
     }
 
     @Transactional
-    public boolean deleteAccount(Long userId) {
+    public boolean deleteAccount(UUID userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return false;
@@ -297,7 +298,7 @@ public class AuthService {
         }
         
         // Extract user information from refresh token
-        Long userId = jwtUtil.extractUserId(refreshToken);
+        UUID userId = jwtUtil.extractUserId(refreshToken);
         String email = jwtUtil.extractUsername(refreshToken);
         String role = jwtUtil.extractRole(refreshToken);
         
