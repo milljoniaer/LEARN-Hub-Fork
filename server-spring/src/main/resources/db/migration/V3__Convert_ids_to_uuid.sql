@@ -134,6 +134,7 @@ ALTER TABLE activities ADD CONSTRAINT activities_document_id_fkey FOREIGN KEY (d
 ALTER TABLE verification_codes ADD CONSTRAINT verification_codes_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE user_search_history ADD CONSTRAINT user_search_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE user_favourites ADD CONSTRAINT user_favourites_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE user_favourites ADD CONSTRAINT user_favourites_activity_id_fkey FOREIGN KEY (activity_id) REFERENCES activities(id);
 
 -- Step 8: Recreate indexes
 CREATE UNIQUE INDEX ix_users_email ON users(email);
