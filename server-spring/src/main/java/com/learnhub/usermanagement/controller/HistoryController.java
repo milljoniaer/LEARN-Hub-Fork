@@ -209,7 +209,12 @@ public class HistoryController {
                 return ResponseEntity.status(401).body(ErrorResponse.of("Unauthorized"));
             }
 
-            UUID activityId = UUID.fromString(requestBody.get("activity_id").toString());
+            UUID activityId;
+            try {
+                activityId = UUID.fromString(requestBody.get("activity_id").toString());
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(ErrorResponse.of("Invalid activity_id format: must be a valid UUID"));
+            }
             String name = (String) requestBody.get("name");
 
             UserFavourites favourite = favouritesService.saveActivityFavourite(userId, activityId, name);
@@ -238,9 +243,20 @@ public class HistoryController {
             }
 
             @SuppressWarnings("unchecked")
-            List<UUID> activityIds = ((List<Object>) requestBody.get("activity_ids")).stream()
-                    .map(id -> UUID.fromString(id.toString()))
-                    .collect(Collectors.toList());
+            List<UUID> activityIds;
+            try {
+                activityIds = ((List<Object>) requestBody.get("activity_ids")).stream()
+                        .map(id -> {
+                            try {
+                                return UUID.fromString(id.toString());
+                            } catch (IllegalArgumentException e) {
+                                throw new RuntimeException("Invalid activity_id in list: " + id + ". Must be a valid UUID");
+                            }
+                        })
+                        .collect(Collectors.toList());
+            } catch (RuntimeException e) {
+                return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
+            }
             String name = (String) requestBody.get("name");
             String lessonPlanSnapshot = objectMapper.writeValueAsString(requestBody.get("lesson_plan_snapshot"));
 

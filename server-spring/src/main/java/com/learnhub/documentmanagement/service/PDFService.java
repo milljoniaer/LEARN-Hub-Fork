@@ -129,6 +129,9 @@ public class PDFService {
                     } else {
                         missingPdfs.add(i);
                     }
+                } catch (IllegalArgumentException e) {
+                    // Invalid UUID format
+                    missingPdfs.add(i);
                 } catch (Exception e) {
                     missingPdfs.add(i);
                 }
@@ -183,7 +186,13 @@ public class PDFService {
                 if (idObj == null)
                     continue;
 
-                UUID activityId = UUID.fromString(idObj.toString());
+                UUID activityId;
+                try {
+                    activityId = UUID.fromString(idObj.toString());
+                } catch (IllegalArgumentException e) {
+                    // Invalid UUID format, skip this activity
+                    continue;
+                }
 
                 // Get activity from database
                 Activity activity = activityRepository.findById(activityId).orElse(null);
@@ -197,7 +206,7 @@ public class PDFService {
                     try {
                         pdfContent = getPdfContent(activity.getDocumentId());
                     } catch (Exception e) {
-                        // Continue to fallback - no UUID fallback available
+                        // PDF not available for this activity
                     }
                 }
 

@@ -197,7 +197,11 @@ public class ActivityService {
         }
         
         if (data.get("document_id") != null) {
-            activity.setDocumentId(UUID.fromString(data.get("document_id").toString()));
+            try {
+                activity.setDocumentId(UUID.fromString(data.get("document_id").toString()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid document_id format: must be a valid UUID");
+            }
         }
         
         return activity;
@@ -239,7 +243,12 @@ public class ActivityService {
             throw new IllegalArgumentException("document_id is required");
         }
 
-        UUID documentId = UUID.fromString(documentIdObj.toString());
+        UUID documentId;
+        try {
+            documentId = UUID.fromString(documentIdObj.toString());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid document_id format: must be a valid UUID");
+        }
 
         // Check if PDF exists
         try {
@@ -247,6 +256,9 @@ public class ActivityService {
             if (pdfContent == null || pdfContent.length == 0) {
                 throw new IllegalArgumentException("PDF document with ID " + documentId + " does not exist");
             }
+        } catch (IllegalArgumentException e) {
+            // Re-throw our custom exceptions
+            throw e;
         } catch (Exception e) {
             throw new IllegalArgumentException("PDF document with ID " + documentId + " does not exist");
         }
