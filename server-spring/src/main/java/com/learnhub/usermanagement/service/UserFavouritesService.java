@@ -27,7 +27,6 @@ public class UserFavouritesService {
         return userFavouritesRepository.findByUserIdAndFavouriteType(userId, type);
     }
 
-    @Transactional
     public UserFavourites saveActivityFavourite(UUID userId, UUID activityId, String name) {
         UserFavourites favourite = new UserFavourites();
         favourite.setUserId(userId);
@@ -38,7 +37,6 @@ public class UserFavouritesService {
         return userFavouritesRepository.save(favourite);
     }
 
-    @Transactional
     public UserFavourites saveLessonPlanFavourite(UUID userId, List<UUID> activityIds, 
                                                     String lessonPlanSnapshot, String name) {
         try {
@@ -55,21 +53,19 @@ public class UserFavouritesService {
         }
     }
 
-    @Transactional
     public boolean deleteFavourite(UUID favouriteId, UUID userId) {
         return userFavouritesRepository.findById(favouriteId)
-            .filter(fav -> fav.getUserId().equals(userId))
-            .map(fav -> {
-                userFavouritesRepository.delete(fav);
-                return true;
-            })
-            .orElse(false);
+                .filter(fav -> fav.getUserId().equals(userId))
+                .map(fav -> {
+                    userFavouritesRepository.delete(fav);
+                    return true;
+                })
+                .orElse(false);
     }
-
-    @Transactional
+  
     public boolean deleteActivityFavourite(UUID userId, UUID activityId) {
         List<UserFavourites> favourites = userFavouritesRepository.findByUserIdAndFavouriteTypeAndActivityId(
-            userId, "activity", activityId);
+                userId, "activity", activityId);
         if (!favourites.isEmpty()) {
             userFavouritesRepository.delete(favourites.get(0));
             return true;
@@ -79,7 +75,7 @@ public class UserFavouritesService {
 
     public boolean isActivityFavourited(UUID userId, UUID activityId) {
         List<UserFavourites> favourites = userFavouritesRepository.findByUserIdAndFavouriteTypeAndActivityId(
-            userId, "activity", activityId);
+                userId, "activity", activityId);
         return !favourites.isEmpty();
     }
 }

@@ -20,7 +20,6 @@ public class UserSearchHistoryService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Transactional
     public void saveSearchQuery(UUID userId, Map<String, Object> searchCriteria) {
         try {
             UserSearchHistory history = new UserSearchHistory();
@@ -39,14 +38,13 @@ public class UserSearchHistoryService {
         return userSearchHistoryRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
 
-    @Transactional
     public boolean deleteSearchHistory(UUID historyId, UUID userId) {
         return userSearchHistoryRepository.findById(historyId)
-            .filter(history -> history.getUserId().equals(userId))
-            .map(history -> {
-                userSearchHistoryRepository.delete(history);
-                return true;
-            })
-            .orElse(false);
+                .filter(history -> history.getUserId().equals(userId))
+                .map(history -> {
+                    userSearchHistoryRepository.delete(history);
+                    return true;
+                })
+                .orElse(false);
     }
 }

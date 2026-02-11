@@ -40,7 +40,6 @@ public class AuthService {
     @Autowired
     private EmailService emailService;
 
-    @Transactional
     public UserResponse registerTeacher(TeacherRegistrationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already registered");
@@ -61,10 +60,9 @@ public class AuthService {
         return mapToUserResponse(user);
     }
 
-    @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // For teachers without password, generate and send verification code
         if (user.getPasswordHash() == null) {
@@ -84,15 +82,14 @@ public class AuthService {
         throw new RuntimeException("Invalid credentials");
     }
 
-    @Transactional
     public LoginResponse verifyCode(VerifyCodeRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         VerificationCode verificationCode = verificationCodeRepository
-            .findByUserIdAndCodeAndUsedAndExpiresAtAfter(
-                user.getId(), request.getCode(), "N", LocalDateTime.now())
-            .orElseThrow(() -> new RuntimeException("Invalid or expired verification code"));
+                .findByUserIdAndCodeAndUsedAndExpiresAtAfter(
+                        user.getId(), request.getCode(), "N", LocalDateTime.now())
+                .orElseThrow(() -> new RuntimeException("Invalid or expired verification code"));
 
         // Mark code as used
         verificationCode.setUsed("Y");
@@ -104,10 +101,9 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, mapToUserResponse(user));
     }
 
-    @Transactional
     public void requestVerificationCode(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String code = generateVerificationCode();
         saveVerificationCode(user.getId(), code);
@@ -144,18 +140,17 @@ public class AuthService {
 
     public UserResponse getUserById(UUID userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return mapToUserResponse(user);
     }
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
-            .stream()
-            .map(this::mapToUserResponse)
-            .toList();
+                .stream()
+                .map(this::mapToUserResponse)
+                .toList();
     }
 
-    @Transactional
     public UserResponse createUser(String email, String firstName, String lastName, String roleStr, String password) {
         // Check if user already exists
         if (userRepository.existsByEmail(email)) {
@@ -169,12 +164,12 @@ public class AuthService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setRole(role);
-        
+
         // Set password (required for both admin and teacher)
         if (password != null && !password.isEmpty()) {
             user.setPasswordHash(passwordEncoder.encode(password));
         }
-        
+
         user = userRepository.save(user);
 
         // Send credentials email for teachers
@@ -185,10 +180,9 @@ public class AuthService {
         return mapToUserResponse(user);
     }
 
-    @Transactional
     public UserResponse updateUser(UUID userId, String email, String firstName, String lastName, String roleStr, String password) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Update email if provided
         if (email != null && !email.isEmpty() && !email.equals(user.getEmail())) {
@@ -224,7 +218,6 @@ public class AuthService {
         return mapToUserResponse(user);
     }
 
-    @Transactional
     public boolean deleteUser(UUID userId, UUID currentUserId) {
         // Prevent admin from deleting themselves
         if (userId.equals(currentUserId)) {
@@ -238,15 +231,14 @@ public class AuthService {
 
         // Delete related data
         verificationCodeRepository.deleteByUserId(userId);
-        
+
         userRepository.delete(user);
         return true;
     }
 
-    @Transactional
     public UserResponse updateProfile(UUID userId, String email, String firstName, String lastName, String password) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Update email if provided
         if (email != null && !email.isEmpty() && !email.equals(user.getEmail())) {
@@ -276,8 +268,7 @@ public class AuthService {
         user = userRepository.save(user);
         return mapToUserResponse(user);
     }
-
-    @Transactional
+  
     public boolean deleteAccount(UUID userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -286,51 +277,50 @@ public class AuthService {
 
         // Delete related data
         verificationCodeRepository.deleteByUserId(userId);
-        
+
         userRepository.delete(user);
         return true;
     }
-    
+
     public LoginResponse refreshToken(String refreshToken) {
         // Validate refresh token
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid or expired refresh token");
         }
-        
+
         // Extract user information from refresh token
         UUID userId = jwtUtil.extractUserId(refreshToken);
         String email = jwtUtil.extractUsername(refreshToken);
         String role = jwtUtil.extractRole(refreshToken);
-        
+
         // Verify user still exists
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         // Generate new tokens
         String newAccessToken = jwtUtil.generateToken(email, userId, role);
         String newRefreshToken = jwtUtil.generateRefreshToken(email, userId, role);
-        
+
         return new LoginResponse(newAccessToken, newRefreshToken, mapToUserResponse(user));
     }
-    
-    @Transactional
+
     public void resetPassword(String email) {
         // Find user by email
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Teacher not found"));
-        
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
         // Verify user is a teacher (not admin)
         if (user.getRole() != UserRole.TEACHER) {
             throw new RuntimeException("Teacher not found");
         }
-        
+
         // Generate new secure password (similar to Flask's PasswordGenerator)
         String newPassword = generateSecurePassword();
-        
+
         // Set new password
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        
+
         // Send password reset email
         try {
             emailService.sendPasswordReset(user.getEmail(), user.getFirstName(), newPassword);
@@ -339,33 +329,33 @@ public class AuthService {
             System.err.println("Failed to send password reset email to " + email + ", but password was reset");
         }
     }
-    
+
     private String generateSecurePassword() {
         // Generate a secure random password similar to Flask's PasswordGenerator
         // Format: 3 random words + 2 digits + 1 special character
         String[] words = {
-            "happy", "sunny", "bright", "swift", "clear", "fresh", "quick", "smart",
-            "brave", "calm", "kind", "wise", "proud", "strong", "gentle", "bold"
+                "happy", "sunny", "bright", "swift", "clear", "fresh", "quick", "smart",
+                "brave", "calm", "kind", "wise", "proud", "strong", "gentle", "bold"
         };
-        
+
         Random random = new Random();
         StringBuilder password = new StringBuilder();
-        
+
         // Add 3 random words with first letter capitalized
         for (int i = 0; i < 3; i++) {
             String word = words[random.nextInt(words.length)];
             password.append(Character.toUpperCase(word.charAt(0)))
-                   .append(word.substring(1));
+                    .append(word.substring(1));
         }
-        
+
         // Add 2 random digits
         password.append(random.nextInt(10));
         password.append(random.nextInt(10));
-        
+
         // Add 1 special character
-        char[] specialChars = {'!', '@', '#', '$', '%', '&', '*'};
+        char[] specialChars = { '!', '@', '#', '$', '%', '&', '*' };
         password.append(specialChars[random.nextInt(specialChars.length)]);
-        
+
         return password.toString();
     }
 }
