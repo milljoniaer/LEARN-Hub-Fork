@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -106,7 +107,7 @@ public class ActivityService {
         }
     }
 
-    public ActivityResponse getActivityById(Long id) {
+    public ActivityResponse getActivityById(UUID id) {
         Activity activity = activityRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Activity not found"));
         return mapToResponse(activity);
@@ -117,7 +118,7 @@ public class ActivityService {
         return mapToResponse(saved);
     }
 
-    public ActivityResponse updateActivity(Long id, Activity activityUpdate) {
+    public ActivityResponse updateActivity(UUID id, Activity activityUpdate) {
         Activity activity = activityRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Activity not found"));
         
@@ -142,7 +143,7 @@ public class ActivityService {
         return mapToResponse(saved);
     }
 
-    public void deleteActivity(Long id) {
+    public void deleteActivity(UUID id) {
         activityRepository.deleteById(id);
     }
 
@@ -196,7 +197,7 @@ public class ActivityService {
         }
         
         if (data.get("document_id") != null) {
-            activity.setDocumentId(Long.parseLong(data.get("document_id").toString()));
+            activity.setDocumentId(UUID.fromString(data.get("document_id").toString()));
         }
         
         return activity;
@@ -238,10 +239,7 @@ public class ActivityService {
             throw new IllegalArgumentException("document_id is required");
         }
 
-        Long documentId = Long.parseLong(documentIdObj.toString());
-        if (documentId <= 0) {
-            throw new IllegalArgumentException("Invalid document_id");
-        }
+        UUID documentId = UUID.fromString(documentIdObj.toString());
 
         // Check if PDF exists
         try {
@@ -277,7 +275,7 @@ public class ActivityService {
                 throw new IllegalArgumentException("PDF file is empty");
             }
 
-            Long documentId = pdfService.storePdf(pdfContent, pdfFile.getOriginalFilename());
+            UUID documentId = pdfService.storePdf(pdfContent, pdfFile.getOriginalFilename());
 
             // Extract activity data using LLM
             String pdfText = new String(pdfContent); // Simplified - should use PDF parser

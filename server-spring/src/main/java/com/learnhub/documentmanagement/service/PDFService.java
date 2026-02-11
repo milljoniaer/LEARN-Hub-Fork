@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class PDFService {
@@ -54,7 +55,7 @@ public class PDFService {
     private String pdfStoragePath;
 
     @Transactional
-    public Long storePdf(byte[] pdfContent, String filename) throws IOException {
+    public UUID storePdf(byte[] pdfContent, String filename) throws IOException {
         // Ensure storage directory exists
         Path storagePath = Paths.get(pdfStoragePath);
         Files.createDirectories(storagePath);
@@ -75,7 +76,7 @@ public class PDFService {
         return document.getId();
     }
 
-    public byte[] getPdfContent(Long documentId) throws IOException {
+    public byte[] getPdfContent(UUID documentId) throws IOException {
         PDFDocument document = pdfDocumentRepository.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("PDF document not found"));
 
@@ -87,13 +88,13 @@ public class PDFService {
         return Files.readAllBytes(filePath);
     }
 
-    public PDFDocument getPdfDocument(Long documentId) {
+    public PDFDocument getPdfDocument(UUID documentId) {
         return pdfDocumentRepository.findById(documentId)
                 .orElseThrow(() -> new RuntimeException("PDF document not found"));
     }
 
     @Transactional
-    public void updatePdfExtractionResults(Long documentId, Map<String, Object> extractedFields, 
+    public void updatePdfExtractionResults(UUID documentId, Map<String, Object> extractedFields, 
                                            String confidenceScore, String extractionQuality) {
         PDFDocument document = pdfDocumentRepository.findById(documentId)
             .orElseThrow(() -> new RuntimeException("PDF document not found"));
@@ -121,7 +122,7 @@ public class PDFService {
 
             if (docIdObj != null) {
                 try {
-                    Long documentId = Long.parseLong(docIdObj.toString());
+                    UUID documentId = UUID.fromString(docIdObj.toString());
                     byte[] content = getPdfContent(documentId);
                     if (content != null && content.length > 0) {
                         availablePdfs++;
@@ -182,7 +183,7 @@ public class PDFService {
                 if (idObj == null)
                     continue;
 
-                Long activityId = Long.parseLong(idObj.toString());
+                UUID activityId = UUID.fromString(idObj.toString());
 
                 // Get activity from database
                 Activity activity = activityRepository.findById(activityId).orElse(null);
@@ -196,16 +197,7 @@ public class PDFService {
                     try {
                         pdfContent = getPdfContent(activity.getDocumentId());
                     } catch (Exception e) {
-                        // Continue to fallback
-                    }
-                }
-
-                // FALLBACK: Try PDF ID 999 (same as Flask)
-                if (pdfContent == null) {
-                    try {
-                        pdfContent = getPdfContent(999L);
-                    } catch (Exception e) {
-                        // No PDF available
+                        // Continue to fallback - no UUID fallback available
                     }
                 }
 
@@ -463,7 +455,7 @@ public class PDFService {
      * Extract activity data from PDF content using LLM.
      * Matches Flask's PDFProcessor.parse_pdf_content() behavior.
      */
-    public Map<String, Object> extractActivityFromPdf(byte[] pdfContent, Long documentId) {
+    public Map<String, Object> extractActivityFromPdf(byte[] pdfContent, UUID documentId) {
         Map<String, Object> result = new HashMap<>();
 
         try {
