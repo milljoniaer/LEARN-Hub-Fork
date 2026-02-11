@@ -62,38 +62,39 @@ FROM activities
 WHERE user_favourites.activity_id = activities.id;
 
 -- Step 3: Drop old foreign key constraints
-ALTER TABLE verification_codes DROP CONSTRAINT verification_codes_user_id_fkey;
-ALTER TABLE user_search_history DROP CONSTRAINT user_search_history_user_id_fkey;
+ALTER TABLE verification_codes DROP CONSTRAINT IF EXISTS verification_codes_user_id_fkey;
+ALTER TABLE user_search_history DROP CONSTRAINT IF EXISTS user_search_history_user_id_fkey;
+ALTER TABLE user_favourites DROP CONSTRAINT IF EXISTS user_favourites_user_id_fkey;
 
 -- Step 4: Drop old columns and indexes
 
 -- Drop old user columns and indexes
 DROP INDEX IF EXISTS ix_users_id;
-ALTER TABLE users DROP COLUMN id;
+ALTER TABLE users DROP COLUMN IF EXISTS id;
 
 -- Drop old pdf_documents columns and indexes
 DROP INDEX IF EXISTS ix_pdf_documents_id;
-ALTER TABLE pdf_documents DROP COLUMN id;
+ALTER TABLE pdf_documents DROP COLUMN IF EXISTS id;
 
 -- Drop old activities columns
-ALTER TABLE activities DROP COLUMN id;
-ALTER TABLE activities DROP COLUMN document_id;
+ALTER TABLE activities DROP COLUMN IF EXISTS id;
+ALTER TABLE activities DROP COLUMN IF EXISTS document_id;
 
 -- Drop old verification_codes columns and indexes
 DROP INDEX IF EXISTS ix_verification_codes_id;
-ALTER TABLE verification_codes DROP COLUMN id;
-ALTER TABLE verification_codes DROP COLUMN user_id;
+ALTER TABLE verification_codes DROP COLUMN IF EXISTS id;
+ALTER TABLE verification_codes DROP COLUMN IF EXISTS user_id;
 
 -- Drop old user_search_history columns and indexes
 DROP INDEX IF EXISTS ix_user_search_history_id;
-ALTER TABLE user_search_history DROP COLUMN id;
-ALTER TABLE user_search_history DROP COLUMN user_id;
+ALTER TABLE user_search_history DROP COLUMN IF EXISTS id;
+ALTER TABLE user_search_history DROP COLUMN IF EXISTS user_id;
 
 -- Drop old user_favourites columns and indexes
 DROP INDEX IF EXISTS ix_user_favourites_id;
-ALTER TABLE user_favourites DROP COLUMN id;
-ALTER TABLE user_favourites DROP COLUMN user_id;
-ALTER TABLE user_favourites DROP COLUMN activity_id;
+ALTER TABLE user_favourites DROP COLUMN IF EXISTS id;
+ALTER TABLE user_favourites DROP COLUMN IF EXISTS user_id;
+ALTER TABLE user_favourites DROP COLUMN IF EXISTS activity_id;
 
 -- Step 5: Rename UUID columns to remove _uuid suffix
 
@@ -132,6 +133,7 @@ ALTER TABLE user_favourites ADD PRIMARY KEY (id);
 ALTER TABLE activities ADD CONSTRAINT activities_document_id_fkey FOREIGN KEY (document_id) REFERENCES pdf_documents(id);
 ALTER TABLE verification_codes ADD CONSTRAINT verification_codes_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
 ALTER TABLE user_search_history ADD CONSTRAINT user_search_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+ALTER TABLE user_favourites ADD CONSTRAINT user_favourites_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
 
 -- Step 8: Recreate indexes
 CREATE UNIQUE INDEX ix_users_email ON users(email);
