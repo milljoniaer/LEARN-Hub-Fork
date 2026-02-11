@@ -70,6 +70,7 @@ ALTER TABLE user_favourites DROP CONSTRAINT IF EXISTS user_favourites_user_id_fk
 
 -- Drop old user columns and indexes
 DROP INDEX IF EXISTS ix_users_id;
+DROP INDEX IF EXISTS ix_users_email;
 ALTER TABLE users DROP COLUMN IF EXISTS id;
 
 -- Drop old pdf_documents columns and indexes
