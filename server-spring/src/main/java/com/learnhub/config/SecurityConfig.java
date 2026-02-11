@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .permitAll()
                         
                         // All other requests are handled by @PreAuthorize annotations on controllers
+                        // Using permitAll here to allow method-level security annotations to take effect
                         .anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
