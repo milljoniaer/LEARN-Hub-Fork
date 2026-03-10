@@ -26,7 +26,7 @@ import { logger } from "@/services/logger";
 import type { FormFieldData } from "@/types/api";
 
 interface UploadedDocument {
-  id: number;
+  id: string;
   filename: string;
   file_size: number;
   extracted_fields: FormFieldData & {
@@ -57,7 +57,7 @@ export const UploadTab: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [uploadedDocumentId, setUploadedDocumentId] = useState<number | null>(
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(
     null,
   );
   const [processingError, setProcessingError] = useState<string | null>(null);
@@ -125,7 +125,7 @@ export const UploadTab: React.FC = () => {
   };
 
   const handleProcessPdf = async (
-    documentId: number,
+    documentId: string,
     filename: string,
     fileSize: number,
   ) => {
@@ -186,7 +186,7 @@ export const UploadTab: React.FC = () => {
     try {
       // Upload the PDF
       const uploadResponse = (await apiService.uploadPdf(selectedFile)) as {
-        document_id: number;
+        document_id: string;
         filename: string;
         file_size: number;
       };

@@ -36,7 +36,7 @@ interface ActivityCreationModalProps {
   onClose: () => void;
   extractedFields?: Record<string, unknown>;
   onSuccess?: (activity: Activity) => void;
-  pdfDocumentId?: number;
+  pdfDocumentId?: string;
 }
 
 export const ActivityCreationModal: React.FC<ActivityCreationModalProps> = ({

@@ -31,7 +31,7 @@ export const ActivityDetails: React.FC = () => {
       return stateActivity;
     }
     if (id) {
-      const fetchedActivity = await apiService.getActivity(parseInt(id));
+      const fetchedActivity = await apiService.getActivity(id);
       if (!fetchedActivity) {
         throw new Error("Activity not found");
       }
@@ -82,7 +82,7 @@ export const ActivityDetails: React.FC = () => {
     if (!activity?.id) return;
 
     await downloadApi.call(async () => {
-      const blob = await apiService.getActivityPdf(activity.id as number);
+      const blob = await apiService.getActivityPdf(activity.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

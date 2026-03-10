@@ -207,7 +207,7 @@ describe("ApiService", () => {
         new Error("Network error"),
       );
 
-      await expect(ApiService.getActivity(1)).rejects.toThrow("Network error");
+      await expect(ApiService.getActivity("1")).rejects.toThrow("Network error");
     });
 
     it("should handle malformed JSON response", async () => {
@@ -217,7 +217,7 @@ describe("ApiService", () => {
         }),
       );
 
-      await expect(ApiService.getActivity(1)).rejects.toThrow();
+      await expect(ApiService.getActivity("1")).rejects.toThrow();
     });
   });
 
@@ -304,7 +304,7 @@ describe("ApiService", () => {
         new Response(JSON.stringify(mockResponse), { status: 200 }),
       );
 
-      const result = await ApiService.processPdf(123);
+      const result = await ApiService.processPdf("123");
 
       const call = vi.mocked(authService.makeAuthenticatedRequest).mock
         .calls[0];
@@ -321,7 +321,7 @@ describe("ApiService", () => {
         new Response(JSON.stringify(mockResponse), { status: 200 }),
       );
 
-      await ApiService.deleteActivity(1);
+      await ApiService.deleteActivity("1");
 
       const call = vi.mocked(authService.makeAuthenticatedRequest).mock
         .calls[0];
@@ -354,7 +354,7 @@ describe("ApiService", () => {
         }),
       );
 
-      const result = await ApiService.downloadPdf(1);
+      const result = await ApiService.downloadPdf("1");
 
       expect(result).toBeInstanceOf(Blob);
       // Note: Response.blob() may not preserve the original blob type
@@ -366,7 +366,7 @@ describe("ApiService", () => {
         new Response("", { status: 404 }),
       );
 
-      await expect(ApiService.downloadPdf(1)).rejects.toThrow(
+      await expect(ApiService.downloadPdf("1")).rejects.toThrow(
         "HTTP error! status: 404",
       );
     });
@@ -388,7 +388,7 @@ describe("ApiService", () => {
         },
       );
 
-      const results = await ApiService.getActivitiesByIds([1, 2, 3]);
+      const results = await ApiService.getActivitiesByIds(["1", "2", "3"]);
 
       expect(results).toHaveLength(3);
       expect(results[0].id).toBe(1);

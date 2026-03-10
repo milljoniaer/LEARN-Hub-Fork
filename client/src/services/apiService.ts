@@ -99,14 +99,14 @@ export class ApiService {
   /**
    * Get activity by ID
    */
-  static async getActivity(id: number) {
+  static async getActivity(id: string) {
     return this.request<Activity>(`/api/activities/${id}`);
   }
 
   /**
    * Get multiple activities by IDs
    */
-  static async getActivitiesByIds(ids: number[]) {
+  static async getActivitiesByIds(ids: string[]) {
     const promises = ids.map((id) => this.getActivity(id));
     const results = await Promise.all(promises);
     return results;
@@ -182,7 +182,7 @@ export class ApiService {
   /**
    * Remove activity favourite
    */
-  static async removeActivityFavourite(activityId: number) {
+  static async removeActivityFavourite(activityId: string) {
     return this.request(`/api/history/favourites/activities/${activityId}`, {
       method: "DELETE",
     });
@@ -191,7 +191,7 @@ export class ApiService {
   /**
    * Delete favourite (by favourite ID)
    */
-  static async deleteFavourite(favouriteId: number) {
+  static async deleteFavourite(favouriteId: string) {
     return this.request(`/api/history/favourites/${favouriteId}`, {
       method: "DELETE",
     });
@@ -200,7 +200,7 @@ export class ApiService {
   /**
    * Check if activity is favourited
    */
-  static async checkActivityFavouriteStatus(activityId: number) {
+  static async checkActivityFavouriteStatus(activityId: string) {
     return this.request<FavoriteStatusResponse>(
       `/api/history/favourites/activities/${activityId}/status`,
     );
@@ -289,14 +289,14 @@ export class ApiService {
   /**
    * Get PDF info
    */
-  static async getPdfInfo(documentId: number) {
+  static async getPdfInfo(documentId: string) {
     return this.request(`/api/documents/${documentId}/info`);
   }
 
   /**
    * Download PDF
    */
-  static async downloadPdf(documentId: number) {
+  static async downloadPdf(documentId: string) {
     const response = await authService.makeAuthenticatedRequest(
       `/api/documents/${documentId}`,
     );
@@ -322,7 +322,7 @@ export class ApiService {
   /**
    * Delete activity (admin only)
    */
-  static async deleteActivity(activityId: number) {
+  static async deleteActivity(activityId: string) {
     return this.request(`/api/activities/${activityId}`, {
       method: "DELETE",
     });
@@ -365,7 +365,7 @@ export class ApiService {
   /**
    * Get PDF by activity ID
    */
-  static async getActivityPdf(activityId: number) {
+  static async getActivityPdf(activityId: string) {
     const response = await authService.makeAuthenticatedRequest(
       `/api/activities/${activityId}/pdf`,
     );
@@ -380,7 +380,7 @@ export class ApiService {
   /**
    * Get PDF by document ID
    */
-  static async getDocumentPdf(documentId: number) {
+  static async getDocumentPdf(documentId: string) {
     const response = await authService.makeAuthenticatedRequest(
       `/api/documents/${documentId}`,
     );
@@ -395,14 +395,14 @@ export class ApiService {
   /**
    * Get PDF document info by document ID
    */
-  static async getDocumentInfo(documentId: number) {
+  static async getDocumentInfo(documentId: string) {
     return this.request<Document>(`/api/documents/${documentId}/info`);
   }
 
   /**
    * Process PDF document and extract activity data
    */
-  static async processPdf(documentId: number) {
+  static async processPdf(documentId: string) {
     return this.request<PdfProcessingResponse>(
       `/api/documents/${documentId}/process`,
       {

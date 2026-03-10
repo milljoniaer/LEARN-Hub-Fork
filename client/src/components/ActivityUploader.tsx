@@ -39,7 +39,7 @@ interface UploadResultData {
     topics?: string[];
     resources_needed?: string[];
   };
-  document_id?: number;
+  document_id?: string;
   extraction_confidence?: number;
   extraction_quality?: string;
 }
@@ -59,7 +59,7 @@ export const ActivityUploader: React.FC = () => {
   const [extractedData, setExtractedData] = useState<
     Record<string, unknown> | undefined
   >(undefined);
-  const [pdfDocumentId, setPdfDocumentId] = useState<number | undefined>(
+  const [pdfDocumentId, setPdfDocumentId] = useState<string | undefined>(
     undefined,
   );
 
@@ -196,7 +196,7 @@ export const ActivityUploader: React.FC = () => {
       // Extract any partial data from the error if available
       const errorData = error as {
         response?: {
-          data?: { activity?: FormFieldData; document_id?: number };
+          data?: { activity?: FormFieldData; document_id?: string };
         };
       };
       if (errorData.response?.data?.activity) {

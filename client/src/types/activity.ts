@@ -9,7 +9,7 @@ export interface BreakAfter {
 }
 
 export interface Activity {
-  id: number;
+  id: string;
   name: string;
   description: string;
   source?: string;
@@ -25,7 +25,7 @@ export interface Activity {
   mental_load?: string;
   physical_energy?: string;
   topics: string[];
-  document_id?: number;
+  document_id?: string;
   created_at?: string;
   artikulationsschema_markdown?: string;
   artikulationsschema_pdf_path?: string;
@@ -157,7 +157,7 @@ export interface LessonPlanInfo {
 
 // Document types
 export interface Document {
-  id: number;
+  id: string;
   filename: string;
   file_size: number;
   mime_type?: string;

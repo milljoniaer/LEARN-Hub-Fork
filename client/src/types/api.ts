@@ -34,7 +34,7 @@ export interface FormFieldData {
 
 // PDF processing response
 export interface PdfProcessingResponse {
-  document_id: number;
+  document_id: string;
   extracted_data: FormFieldData;
   confidence: number;
   text_length: number;
@@ -44,7 +44,7 @@ export interface PdfProcessingResponse {
 // Upload and create activity response
 export interface UploadCreateResponse {
   activity: FormFieldData;
-  document_id: number;
+  document_id: string;
   extraction_confidence: number;
   extraction_quality: string;
 }
@@ -103,13 +103,13 @@ export interface UpdateProfileRequest {
 
 // Favorite activity request
 export interface FavoriteActivityRequest {
-  activity_id: number;
+  activity_id: string;
   name?: string;
 }
 
 // Favorite lesson plan request
 export interface FavoriteLessonPlanRequest {
-  activity_ids: number[];
+  activity_ids: string[];
   name?: string;
   lesson_plan: import("./activity").LessonPlanData;
 }
@@ -117,7 +117,7 @@ export interface FavoriteLessonPlanRequest {
 // Lesson plan generation request
 export interface LessonPlanRequest {
   activities: Array<{
-    id: number;
+    id: string;
     name: string;
     description: string;
     source?: string;
@@ -133,7 +133,7 @@ export interface LessonPlanRequest {
     mental_load?: string;
     physical_energy?: string;
     topics: string[];
-    document_id?: number;
+    document_id?: string;
     created_at?: string;
     type: "activity";
   }>;
@@ -169,9 +169,9 @@ export interface SearchCriteria {
 // Activity favorites response
 export interface ActivityFavoritesResponse {
   favourites: Array<{
-    id: number;
+    id: string;
     favourite_type: string;
-    activity_id: number;
+    activity_id: string;
     name: string | null;
     created_at: string;
   }>;
@@ -185,10 +185,10 @@ export interface ActivityFavoritesResponse {
 // Lesson plan favorites response
 export interface LessonPlanFavoritesResponse {
   favourites: Array<{
-    id: number;
+    id: string;
     favourite_type: string;
     name: string | null;
-    activity_ids: number[];
+    activity_ids: string[];
     lesson_plan?: import("./activity").LessonPlanData;
     created_at: string;
   }>;
