@@ -246,6 +246,13 @@ public class ActivityService {
 			}
 		}
 
+		if (data.get("artikulationsschema_markdown") != null) {
+			activity.setArtikulationsschemaMarkdown(data.get("artikulationsschema_markdown").toString());
+		}
+		if (data.get("artikulationsschema_pdf_path") != null) {
+			activity.setArtikulationsschemaPdfPath(data.get("artikulationsschema_pdf_path").toString());
+		}
+
 		return activity;
 	}
 
@@ -273,6 +280,8 @@ public class ActivityService {
 		response.setResourcesNeeded(activity.getResourcesNeeded());
 		response.setTopics(activity.getTopics());
 		response.setDocumentId(activity.getDocumentId());
+		response.setArtikulationsschemaMarkdown(activity.getArtikulationsschemaMarkdown());
+		response.setArtikulationsschemaPdfPath(activity.getArtikulationsschemaPdfPath());
 		return response;
 	}
 
@@ -320,6 +329,60 @@ public class ActivityService {
 		// Create activity from request
 		Activity activity = createActivityFromMap(request);
 		return createActivity(activity);
+	}
+
+	/**
+	 * Upload PDF, cache it, and extract metadata using LLM. Returns document_id
+	 * (cache key) and extracted data for the 2-step creation flow. The PDF is NOT
+	 * persisted yet – call createActivityWithValidation to finalize.
+	 */
+	public Map<String, Object> uploadPdfAndExtractMetadata(MultipartFile pdfFile) {
+		try {
+			if (pdfFile.isEmpty()) {
+				throw new IllegalArgumentException("No PDF file provided");
+			}
+
+			if (!pdfFile.getOriginalFilename().toLowerCase().endsWith(".pdf")) {
+				throw new IllegalArgumentException("File must be a PDF");
+			}
+
+			byte[] pdfContent = pdfFile.getBytes();
+			if (pdfContent.length == 0) {
+				throw new IllegalArgumentException("PDF file is empty");
+			}
+
+			UUID cacheKey = pdfService.cachePdf(pdfContent, pdfFile.getOriginalFilename());
+
+			// Extract text and metadata using LLM
+			String pdfText = pdfService.extractTextFromPdf(cacheKey);
+			Map<String, Object> extractionResult = llmService.extractActivityData(pdfText);
+
+			Map<String, Object> extractedData = (Map<String, Object>) extractionResult.get("data");
+			Double confidence = extractionResult.get("confidence") != null
+					? (Double) extractionResult.get("confidence")
+					: 0.0;
+
+			String extractionQuality = determineExtractionQuality(confidence);
+
+			// Update cached PDF with extraction results
+			String confidenceScore = String.format("%.3f", confidence);
+			pdfService.updatePdfExtractionResults(cacheKey, extractedData, confidenceScore, extractionQuality);
+
+			// Apply defaults
+			Map<String, Object> activityData = applyActivityDefaults(extractedData);
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("document_id", cacheKey.toString());
+			response.put("extracted_data", activityData);
+			response.put("extraction_confidence", confidence);
+			response.put("extraction_quality", extractionQuality);
+
+			return response;
+		} catch (IllegalArgumentException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to upload PDF and extract metadata: " + e.getMessage(), e);
+		}
 	}
 
 	/**

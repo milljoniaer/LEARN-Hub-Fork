@@ -9,6 +9,8 @@ import com.learnhub.activitymanagement.dto.response.LessonPlanInfoResponse;
 import com.learnhub.activitymanagement.service.ActivityService;
 import com.learnhub.activitymanagement.service.RecommendationService;
 import com.learnhub.activitymanagement.service.ScoringEngineService;
+import com.learnhub.documentmanagement.service.ArtikulationsschemaService;
+import com.learnhub.documentmanagement.service.LLMService;
 import com.learnhub.documentmanagement.service.PDFService;
 import com.learnhub.dto.response.ErrorResponse;
 import com.learnhub.usermanagement.service.UserSearchHistoryService;
@@ -48,6 +50,12 @@ public class ActivityController {
 
 	@Autowired
 	private UserSearchHistoryService searchHistoryService;
+
+	@Autowired
+	private LLMService llmService;
+
+	@Autowired
+	private ArtikulationsschemaService artikulationsschemaService;
 
 	@GetMapping("/")
 	@PreAuthorize("permitAll()")
@@ -298,6 +306,91 @@ public class ActivityController {
 			logger.error("POST /api/activities/lesson-plan/info - Failed to get lesson plan info: {}", e.getMessage());
 			return ResponseEntity.status(500)
 					.body(ErrorResponse.of("Failed to get lesson plan info: " + e.getMessage()));
+		}
+	}
+
+	@PostMapping("/generate-artikulationsschema")
+	@PreAuthorize("hasRole('ADMIN')")
+	@SecurityRequirement(name = "BearerAuth")
+	@Operation(summary = "Generate Artikulationsschema", description = "Generate or extract an Artikulationsschema markdown from an uploaded PDF (admin only)")
+	public ResponseEntity<?> generateArtikulationsschema(@RequestBody Map<String, Object> request) {
+		logger.info("POST /api/activities/generate-artikulationsschema called");
+		try {
+			Object documentIdObj = request.get("document_id");
+			if (documentIdObj == null) {
+				return ResponseEntity.badRequest().body(ErrorResponse.of("document_id is required"));
+			}
+
+			UUID documentId;
+			try {
+				documentId = UUID.fromString(documentIdObj.toString());
+			} catch (IllegalArgumentException e) {
+				return ResponseEntity.badRequest().body(ErrorResponse.of("Invalid document_id format"));
+			}
+
+			// Get PDF text from cached or persisted PDF
+			String pdfText = pdfService.extractTextFromPdf(documentId);
+			if (pdfText == null || pdfText.trim().length() < 10) {
+				return ResponseEntity.badRequest()
+						.body(ErrorResponse.of("PDF does not contain sufficient text for schema generation"));
+			}
+
+			String markdown = llmService.generateArtikulationsschema(pdfText);
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("markdown", markdown);
+			response.put("document_id", documentId.toString());
+
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			logger.error("POST /api/activities/generate-artikulationsschema - Failed: {}", e.getMessage());
+			return ResponseEntity.status(500)
+					.body(ErrorResponse.of("Failed to generate Artikulationsschema: " + e.getMessage()));
+		}
+	}
+
+	@PostMapping("/preview-artikulationsschema-pdf")
+	@PreAuthorize("hasRole('ADMIN')")
+	@SecurityRequirement(name = "BearerAuth")
+	@Operation(summary = "Preview Artikulationsschema PDF", description = "Render Artikulationsschema markdown to a preview PDF (admin only)")
+	public ResponseEntity<?> previewArtikulationsschemaPdf(@RequestBody Map<String, String> request) {
+		logger.info("POST /api/activities/preview-artikulationsschema-pdf called");
+		try {
+			String markdown = request.get("markdown");
+			if (markdown == null || markdown.trim().isEmpty()) {
+				return ResponseEntity.badRequest().body(ErrorResponse.of("markdown is required"));
+			}
+
+			byte[] pdfBytes = artikulationsschemaService.renderMarkdownToPdf(markdown);
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+			headers.setContentDispositionFormData("inline", "artikulationsschema_preview.pdf");
+			headers.setContentLength(pdfBytes.length);
+
+			return ResponseEntity.ok().headers(headers).body(pdfBytes);
+		} catch (Exception e) {
+			logger.error("POST /api/activities/preview-artikulationsschema-pdf - Failed: {}", e.getMessage());
+			return ResponseEntity.status(500).body(ErrorResponse.of("Failed to render preview PDF: " + e.getMessage()));
+		}
+	}
+
+	@PostMapping("/upload-pdf-draft")
+	@PreAuthorize("hasRole('ADMIN')")
+	@SecurityRequirement(name = "BearerAuth")
+	@Operation(summary = "Upload PDF for draft activity", description = "Upload a PDF and cache it, returning a document_id and extracted metadata for the 2-step creation flow (admin only)")
+	public ResponseEntity<?> uploadPdfDraft(@RequestParam("pdf_file") MultipartFile pdfFile) {
+		logger.info("POST /api/activities/upload-pdf-draft - Upload PDF draft called with file={}",
+				pdfFile.getOriginalFilename());
+		try {
+			Map<String, Object> result = activityService.uploadPdfAndExtractMetadata(pdfFile);
+			return ResponseEntity.status(201).body(result);
+		} catch (IllegalArgumentException e) {
+			logger.error("POST /api/activities/upload-pdf-draft - Invalid input: {}", e.getMessage());
+			return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
+		} catch (Exception e) {
+			logger.error("POST /api/activities/upload-pdf-draft - Failed: {}", e.getMessage());
+			return ResponseEntity.status(500).body(ErrorResponse.of("Failed to upload PDF draft: " + e.getMessage()));
 		}
 	}
 
