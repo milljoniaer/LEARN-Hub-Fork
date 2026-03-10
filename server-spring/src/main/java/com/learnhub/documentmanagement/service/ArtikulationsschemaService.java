@@ -199,11 +199,15 @@ public class ArtikulationsschemaService {
 	private List<String> parseCells(String rowContent) {
 		String[] parts = rowContent.split("\\|", -1);
 		List<String> cells = new ArrayList<>();
+		boolean foundContent = false;
 		for (String part : parts) {
 			String trimmed = part.trim();
-			if (!trimmed.isEmpty() || cells.size() > 0) {
-				cells.add(trimmed);
+			if (!foundContent && trimmed.isEmpty()) {
+				// Skip leading empty cells from the split
+				continue;
 			}
+			foundContent = true;
+			cells.add(trimmed);
 		}
 		// Remove trailing empty cell if present
 		while (!cells.isEmpty() && cells.get(cells.size() - 1).isEmpty()) {

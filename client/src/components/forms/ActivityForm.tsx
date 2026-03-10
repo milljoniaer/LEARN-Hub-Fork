@@ -25,7 +25,7 @@ interface ActivityFormData extends FormFieldData {
   cleanup_time_minutes: number;
   resources_needed: string[];
   topics: string[];
-  document_id: number | null;
+  document_id: number | string | null;
 }
 
 interface ActivityFormProps {

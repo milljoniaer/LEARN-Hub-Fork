@@ -45,7 +45,7 @@ interface ActivityFormData {
   cleanup_time_minutes: number;
   resources_needed: string[];
   topics: string[];
-  document_id: number | null;
+  document_id: number | string | null;
   [key: string]: string | number | boolean | string[] | null | undefined;
 }
 
@@ -461,7 +461,7 @@ export const ActivitySetupPage: React.FC = () => {
                   savedMetadata ||
                   ({
                     ...extractedData,
-                    document_id: documentId ? Number(documentId) : null,
+                    document_id: documentId || null,
                   } as Partial<ActivityFormData>)
                 }
                 onSubmit={handleMetadataNext}

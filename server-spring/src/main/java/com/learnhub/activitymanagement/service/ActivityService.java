@@ -357,7 +357,12 @@ public class ActivityService {
 			String pdfText = pdfService.extractTextFromPdf(cacheKey);
 			Map<String, Object> extractionResult = llmService.extractActivityData(pdfText);
 
-			Map<String, Object> extractedData = (Map<String, Object>) extractionResult.get("data");
+			Object dataObj = extractionResult.get("data");
+			if (!(dataObj instanceof Map)) {
+				throw new RuntimeException("LLM extraction did not return a valid data map");
+			}
+			@SuppressWarnings("unchecked")
+			Map<String, Object> extractedData = (Map<String, Object>) dataObj;
 			Double confidence = extractionResult.get("confidence") != null
 					? (Double) extractionResult.get("confidence")
 					: 0.0;
@@ -410,7 +415,12 @@ public class ActivityService {
 			String pdfText = new String(pdfContent); // Simplified - should use PDF parser
 			Map<String, Object> extractionResult = llmService.extractActivityData(pdfText);
 
-			Map<String, Object> extractedData = (Map<String, Object>) extractionResult.get("data");
+			Object dataObj = extractionResult.get("data");
+			if (!(dataObj instanceof Map)) {
+				throw new RuntimeException("LLM extraction did not return a valid data map");
+			}
+			@SuppressWarnings("unchecked")
+			Map<String, Object> extractedData = (Map<String, Object>) dataObj;
 			Double confidence = extractionResult.get("confidence") != null
 					? (Double) extractionResult.get("confidence")
 					: 0.0;

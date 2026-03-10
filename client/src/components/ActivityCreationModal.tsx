@@ -27,7 +27,7 @@ interface ActivityFormData {
   cleanup_time_minutes: number;
   resources_needed: string[];
   topics: string[];
-  document_id: number | null;
+  document_id: number | string | null;
   [key: string]: unknown;
 }
 
