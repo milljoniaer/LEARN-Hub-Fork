@@ -33,6 +33,8 @@ interface ActivityFormProps {
   onSubmit: (data: ActivityFormData) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
+  submitLabel?: string;
+  cancelLabel?: string;
 }
 
 const defaultFormData: ActivityFormData = {
@@ -59,6 +61,8 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false,
+  submitLabel = "Create Activity",
+  cancelLabel = "Cancel",
 }) => {
   const { fieldValues } = useFieldValues();
   const [formData, setFormData] = useState<ActivityFormData>({
@@ -369,10 +373,10 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({
 
       <div className="flex gap-2 justify-end">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {cancelLabel}
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Creating..." : "Create Activity"}
+          {isLoading ? "Creating..." : submitLabel}
         </Button>
       </div>
     </form>

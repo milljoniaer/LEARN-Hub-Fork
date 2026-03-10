@@ -49,6 +49,20 @@ export interface UploadCreateResponse {
   extraction_quality: string;
 }
 
+// Upload PDF draft response (2-step flow)
+export interface UploadPdfDraftResponse {
+  document_id: string;
+  extracted_data: FormFieldData;
+  extraction_confidence: number;
+  extraction_quality: string;
+}
+
+// Artikulationsschema generation response
+export interface ArtikulationsschemaResponse {
+  markdown: string;
+  document_id: string;
+}
+
 // Activity creation request
 export interface CreateActivityRequest {
   name: string;
@@ -66,7 +80,8 @@ export interface CreateActivityRequest {
   mental_load?: string;
   physical_energy?: string;
   topics: string[];
-  document_id?: number;
+  document_id?: number | string;
+  artikulationsschema_markdown?: string;
 }
 
 // User creation/update request

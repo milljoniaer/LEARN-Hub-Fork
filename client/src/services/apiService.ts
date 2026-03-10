@@ -12,6 +12,8 @@ import type {
 import type {
   PdfProcessingResponse,
   UploadCreateResponse,
+  UploadPdfDraftResponse,
+  ArtikulationsschemaResponse,
   CreateActivityRequest,
   UserRequest,
   FavoriteActivityRequest,
@@ -446,6 +448,62 @@ export class ApiService {
     return this.request<ScoringInsightsResponse>(
       "/api/activities/scoring-insights",
     );
+  }
+
+  /**
+   * Upload PDF for the 2-step activity creation flow.
+   * Caches the PDF and extracts metadata without creating an activity.
+   */
+  static async uploadPdfDraft(file: File) {
+    const formData = new FormData();
+    formData.append("pdf_file", file);
+
+    return this.request<UploadPdfDraftResponse>(
+      "/api/activities/upload-pdf-draft",
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+  }
+
+  /**
+   * Generate Artikulationsschema markdown from an uploaded PDF.
+   */
+  static async generateArtikulationsschema(documentId: string) {
+    return this.request<ArtikulationsschemaResponse>(
+      "/api/activities/generate-artikulationsschema",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ document_id: documentId }),
+      },
+    );
+  }
+
+  /**
+   * Render Artikulationsschema markdown to a preview PDF.
+   * Returns a Blob containing the PDF bytes.
+   */
+  static async previewArtikulationsschemaPdf(markdown: string) {
+    const response = await authService.makeAuthenticatedRequest(
+      "/api/activities/preview-artikulationsschema-pdf",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ markdown }),
+      },
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        (errorData as Record<string, string>).error ||
+          `HTTP error! status: ${response.status}`,
+      );
+    }
+
+    return response.blob();
   }
 }
 

@@ -16,6 +16,7 @@ import { UserManagementPage } from "@/pages/UserManagementPage";
 import { SearchHistoryPage } from "@/pages/SearchHistoryPage";
 import { FavouritesPage } from "@/pages/FavouritesPage";
 import { UploadTab } from "@/components/UploadTab";
+import { ActivitySetupPage } from "@/pages/ActivitySetupPage";
 import { AccountDashboardPage } from "@/pages/AccountDashboardPage";
 
 // Simple wrapper for protected routes with layout
@@ -96,6 +97,14 @@ function App() {
                   element={
                     <ProtectedLayout requiredRole="ADMIN">
                       <UploadTab />
+                    </ProtectedLayout>
+                  }
+                />
+                <Route
+                  path="/activity-setup"
+                  element={
+                    <ProtectedLayout requiredRole="ADMIN">
+                      <ActivitySetupPage />
                     </ProtectedLayout>
                   }
                 />
