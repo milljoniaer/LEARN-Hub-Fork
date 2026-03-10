@@ -378,6 +378,21 @@ export class ApiService {
   }
 
   /**
+   * Get Artikulationsschema PDF by activity ID
+   */
+  static async getArtikulationsschemaPdf(activityId: string) {
+    const response = await authService.makeAuthenticatedRequest(
+      `/api/activities/${activityId}/artikulationsschema-pdf`,
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.blob();
+  }
+
+  /**
    * Get PDF by document ID
    */
   static async getDocumentPdf(documentId: string) {

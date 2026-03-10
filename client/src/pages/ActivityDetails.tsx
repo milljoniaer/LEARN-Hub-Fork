@@ -5,7 +5,7 @@ import { LoadingState, SkeletonGrid } from "@/components/ui/LoadingState";
 import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 import { useDataFetch } from "@/hooks/useDataFetch";
 import { useApi } from "@/hooks/useApi";
-import { Brain, Activity as ActivityIcon, FileText } from "lucide-react";
+import { Brain, Activity as ActivityIcon, FileText, BookOpen } from "lucide-react";
 import { FavouriteButton } from "@/components/favourites/FavouriteButton";
 import { apiService } from "@/services/apiService";
 import type { Activity } from "@/types/activity";
@@ -24,6 +24,7 @@ export const ActivityDetails: React.FC = () => {
 
   // API hooks for data fetching
   const downloadApi = useApi();
+  const artikulationsschemaApi = useApi();
 
   // Data fetching for activity details
   const fetchActivity = useCallback(async () => {
@@ -91,6 +92,16 @@ export const ActivityDetails: React.FC = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+    });
+  };
+
+  const handleViewArtikulationsschema = async () => {
+    if (!activity?.id) return;
+
+    await artikulationsschemaApi.call(async () => {
+      const blob = await apiService.getArtikulationsschemaPdf(activity.id);
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, "_blank");
     });
   };
 
@@ -171,6 +182,18 @@ export const ActivityDetails: React.FC = () => {
               <FileText className="h-4 w-4" />
               {downloadApi.isLoading ? "Loading..." : "View PDF"}
             </Button>
+            {activity.artikulationsschema_markdown && (
+              <Button
+                onClick={handleViewArtikulationsschema}
+                disabled={artikulationsschemaApi.isLoading}
+                className="bg-blue-500 hover:bg-blue-700 flex items-center gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                {artikulationsschemaApi.isLoading
+                  ? "Loading..."
+                  : "View Artikulationsschema"}
+              </Button>
+            )}
             <Button onClick={handleBack} variant="outline">
               {fromBrowser ? "Back to Library" : "Back to Form"}
             </Button>
