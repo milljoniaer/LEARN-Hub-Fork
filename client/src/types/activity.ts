@@ -28,7 +28,6 @@ export interface Activity {
   document_id?: string;
   created_at?: string;
   artikulationsschema_markdown?: string;
-  artikulationsschema_pdf_path?: string;
   type: "activity";
   // Break that should happen after this activity
   break_after?: BreakAfter;

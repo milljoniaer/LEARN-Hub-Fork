@@ -260,9 +260,6 @@ public class ActivityService {
 		if (data.get("artikulationsschema_markdown") != null) {
 			activity.setArtikulationsschemaMarkdown(data.get("artikulationsschema_markdown").toString());
 		}
-		if (data.get("artikulationsschema_pdf_path") != null) {
-			activity.setArtikulationsschemaPdfPath(data.get("artikulationsschema_pdf_path").toString());
-		}
 
 		return activity;
 	}
@@ -292,7 +289,6 @@ public class ActivityService {
 		response.setTopics(activity.getTopics());
 		response.setDocumentId(activity.getDocumentId());
 		response.setArtikulationsschemaMarkdown(activity.getArtikulationsschemaMarkdown());
-		response.setArtikulationsschemaPdfPath(activity.getArtikulationsschemaPdfPath());
 		return response;
 	}
 

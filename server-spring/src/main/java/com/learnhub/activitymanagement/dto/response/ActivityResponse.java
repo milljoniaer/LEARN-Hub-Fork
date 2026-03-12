@@ -56,8 +56,5 @@ public class ActivityResponse {
 	@JsonProperty("artikulationsschema_markdown")
 	private String artikulationsschemaMarkdown;
 
-	@JsonProperty("artikulationsschema_pdf_path")
-	private String artikulationsschemaPdfPath;
-
 	private String type = "activity";
 }

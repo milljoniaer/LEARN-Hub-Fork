@@ -88,9 +88,6 @@ public class Activity {
 	@Column(name = "artikulationsschema_markdown", columnDefinition = "TEXT")
 	private String artikulationsschemaMarkdown;
 
-	@Column(name = "artikulationsschema_pdf_path", length = 500)
-	private String artikulationsschemaPdfPath;
-
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
