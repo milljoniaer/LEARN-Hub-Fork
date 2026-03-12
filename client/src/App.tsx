@@ -15,7 +15,6 @@ import { ActivityDetails } from "@/pages/ActivityDetails";
 import { UserManagementPage } from "@/pages/UserManagementPage";
 import { SearchHistoryPage } from "@/pages/SearchHistoryPage";
 import { FavouritesPage } from "@/pages/FavouritesPage";
-import { UploadTab } from "@/components/UploadTab";
 import { ActivitySetupPage } from "@/pages/ActivitySetupPage";
 import { AccountDashboardPage } from "@/pages/AccountDashboardPage";
 
@@ -94,14 +93,6 @@ function App() {
                 />
                 <Route
                   path="/upload"
-                  element={
-                    <ProtectedLayout requiredRole="ADMIN">
-                      <UploadTab />
-                    </ProtectedLayout>
-                  }
-                />
-                <Route
-                  path="/activity-setup"
                   element={
                     <ProtectedLayout requiredRole="ADMIN">
                       <ActivitySetupPage />

@@ -11,6 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Upload,
   FileText,
   CheckCircle,
@@ -79,6 +85,7 @@ export const ActivitySetupPage: React.FC = () => {
   // PDF preview state
   const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
   const [isRenderingPreview, setIsRenderingPreview] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   // Upload state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -293,7 +300,7 @@ export const ActivitySetupPage: React.FC = () => {
   // ─── Render ─────────────────────────────────────────────────────
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-6">
+    <div className="w-full px-4 py-6">
       {/* Step Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-center gap-2">
@@ -556,58 +563,116 @@ export const ActivitySetupPage: React.FC = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-16rem)]">
-              {/* Left: Markdown Editor */}
-              <Card className="flex flex-col min-h-0">
-                <CardHeader className="pb-2 flex-shrink-0">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Edit3 className="h-4 w-4" />
-                    Markdown Editor
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-0 pb-4">
-                  <textarea
-                    value={artikulationsschemaMarkdown}
-                    onChange={handleMarkdownChange}
-                    className="w-full h-full min-h-[400px] resize-none rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    placeholder="# Artikulationsschema&#10;&#10;**Thema:** ...&#10;&#10;| Zeit | Phase | Handlungsschritte | Sozialform | Kompetenzen | Medien/Material |&#10;|------|-------|-------------------|------------|-------------|-----------------|&#10;| 5 min | Einstieg | ... | Plenum | ... | ... |"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Right: PDF Preview */}
-              <Card className="flex flex-col min-h-0">
-                <CardHeader className="pb-2 flex-shrink-0">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Eye className="h-4 w-4" />
-                    PDF Preview
-                    {isRenderingPreview && (
-                      <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-0 pb-4">
-                  {previewPdfUrl ? (
-                    <iframe
-                      src={previewPdfUrl}
-                      className="w-full h-full min-h-[400px] rounded-md border"
-                      title="Artikulationsschema Preview"
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-16rem)]">
+                {/* Left: Markdown Editor */}
+                <Card className="flex flex-col min-h-0">
+                  <CardHeader className="pb-2 flex-shrink-0">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Edit3 className="h-4 w-4" />
+                      Markdown Editor
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 min-h-0 pb-4">
+                    <textarea
+                      value={artikulationsschemaMarkdown}
+                      onChange={handleMarkdownChange}
+                      className="w-full h-full min-h-[400px] resize-none rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      placeholder="# Artikulationsschema&#10;&#10;**Thema:** ...&#10;&#10;| Zeit | Phase | Handlungsschritte | Sozialform | Kompetenzen | Medien/Material |&#10;|------|-------|-------------------|------------|-------------|-----------------|&#10;| 5 min | Einstieg | ... | Plenum | ... | ... |"
                     />
-                  ) : (
-                    <div className="w-full h-full min-h-[400px] flex items-center justify-center rounded-md border bg-muted/30">
-                      <div className="text-center text-muted-foreground">
-                        <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">
-                          {isRenderingPreview
-                            ? "Rendering preview..."
-                            : "Edit the markdown to see a PDF preview"}
-                        </p>
+                  </CardContent>
+                </Card>
+
+                {/* Right: PDF Preview (desktop only) */}
+                <Card className="hidden lg:flex flex-col min-h-0">
+                  <CardHeader className="pb-2 flex-shrink-0">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Eye className="h-4 w-4" />
+                      PDF Preview
+                      {isRenderingPreview && (
+                        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1 min-h-0 pb-4">
+                    {previewPdfUrl ? (
+                      <iframe
+                        src={previewPdfUrl}
+                        className="w-full h-full min-h-[400px] rounded-md border"
+                        title="Artikulationsschema Preview"
+                      />
+                    ) : (
+                      <div className="w-full h-full min-h-[400px] flex items-center justify-center rounded-md border bg-muted/30">
+                        <div className="text-center text-muted-foreground">
+                          <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">
+                            {isRenderingPreview
+                              ? "Rendering preview..."
+                              : "Edit the markdown to see a PDF preview"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Mobile: Render Preview button */}
+              <div className="lg:hidden mt-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    if (!previewPdfUrl && artikulationsschemaMarkdown) {
+                      debouncedRenderPreview(artikulationsschemaMarkdown);
+                    }
+                    setIsPreviewModalOpen(true);
+                  }}
+                  disabled={!artikulationsschemaMarkdown}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Render Preview
+                </Button>
+              </div>
+
+              {/* Mobile: PDF Preview Dialog */}
+              <Dialog
+                open={isPreviewModalOpen}
+                onOpenChange={setIsPreviewModalOpen}
+              >
+                <DialogContent className="max-w-[95vw] w-full h-[85vh] flex flex-col p-0">
+                  <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
+                    <DialogTitle className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      PDF Preview
+                      {isRenderingPreview && (
+                        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                      )}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="flex-1 min-h-0 px-6 pb-6">
+                    {previewPdfUrl ? (
+                      <iframe
+                        src={previewPdfUrl}
+                        className="w-full h-full rounded-md border"
+                        title="Artikulationsschema Preview"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center rounded-md border bg-muted/30">
+                        <div className="text-center text-muted-foreground">
+                          <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">
+                            {isRenderingPreview
+                              ? "Rendering preview..."
+                              : "Edit the markdown to see a PDF preview"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </div>
       )}

@@ -2,7 +2,6 @@ import {
   Home,
   Library,
   Plus,
-  FileEdit,
   Users,
   History,
   Heart,
@@ -52,13 +51,6 @@ export const NAVIGATION_TABS: NavigationTab[] = [
     label: "Upload",
     path: "/upload",
     icon: Plus,
-    roles: ["ADMIN"],
-  },
-  {
-    id: "activity-setup",
-    label: "Activity Setup",
-    path: "/activity-setup",
-    icon: FileEdit,
     roles: ["ADMIN"],
   },
   {
