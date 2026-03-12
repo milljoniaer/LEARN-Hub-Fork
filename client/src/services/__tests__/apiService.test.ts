@@ -269,51 +269,6 @@ describe("ApiService", () => {
     });
   });
 
-  describe("FormData Methods", () => {
-    it("should send FormData for file upload", async () => {
-      const mockResponse = { document_id: 1 };
-      vi.mocked(authService.makeAuthenticatedRequest).mockResolvedValue(
-        new Response(JSON.stringify(mockResponse), { status: 200 }),
-      );
-
-      const file = new File(["content"], "test.pdf", {
-        type: "application/pdf",
-      });
-      await ApiService.uploadPdf(file);
-
-      const call = vi.mocked(authService.makeAuthenticatedRequest).mock
-        .calls[0];
-      expect(call[1]?.method).toBe("POST");
-      expect(call[1]?.body).toBeInstanceOf(FormData);
-
-      const formData = call[1]?.body as FormData;
-      expect(formData.get("pdf_file")).toBe(file);
-    });
-
-    it("should process uploaded PDF document", async () => {
-      const mockResponse = {
-        extracted_data: {
-          name: "Test Activity",
-          description: "Test description",
-          format: "unplugged",
-        },
-        confidence: 0.85,
-        extraction_quality: "high",
-      };
-      vi.mocked(authService.makeAuthenticatedRequest).mockResolvedValue(
-        new Response(JSON.stringify(mockResponse), { status: 200 }),
-      );
-
-      const result = await ApiService.processPdf("123");
-
-      const call = vi.mocked(authService.makeAuthenticatedRequest).mock
-        .calls[0];
-      expect(call[0]).toBe("/api/documents/123/process");
-      expect(call[1]?.method).toBe("POST");
-      expect(result).toEqual(mockResponse);
-    });
-  });
-
   describe("DELETE Methods", () => {
     it("should send DELETE request correctly", async () => {
       const mockResponse = { success: true };
@@ -341,34 +296,6 @@ describe("ApiService", () => {
         .calls[0];
       expect(call[0]).toBe("/api/history/search/123");
       expect(call[1]?.method).toBe("DELETE");
-    });
-  });
-
-  describe("Blob Response Methods", () => {
-    it("should handle blob responses for PDF downloads", async () => {
-      const mockBlob = new Blob(["pdf content"], { type: "application/pdf" });
-      vi.mocked(authService.makeAuthenticatedRequest).mockResolvedValue(
-        new Response(mockBlob, {
-          status: 200,
-          headers: { "Content-Type": "application/pdf" },
-        }),
-      );
-
-      const result = await ApiService.downloadPdf("1");
-
-      expect(result).toBeInstanceOf(Blob);
-      // Note: Response.blob() may not preserve the original blob type
-      expect(result.size).toBeGreaterThan(0);
-    });
-
-    it("should throw error on failed blob download", async () => {
-      vi.mocked(authService.makeAuthenticatedRequest).mockResolvedValue(
-        new Response("", { status: 404 }),
-      );
-
-      await expect(ApiService.downloadPdf("1")).rejects.toThrow(
-        "HTTP error! status: 404",
-      );
     });
   });
 

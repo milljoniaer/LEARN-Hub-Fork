@@ -32,23 +32,6 @@ export interface FormFieldData {
   [key: string]: string | number | boolean | string[] | null | undefined;
 }
 
-// PDF processing response
-export interface PdfProcessingResponse {
-  document_id: string;
-  extracted_data: FormFieldData;
-  confidence: number;
-  text_length: number;
-  extraction_quality: string;
-}
-
-// Upload and create activity response
-export interface UploadCreateResponse {
-  activity: FormFieldData;
-  document_id: string;
-  extraction_confidence: number;
-  extraction_quality: string;
-}
-
 // Upload PDF draft response (2-step flow)
 export interface UploadPdfDraftResponse {
   document_id: string;

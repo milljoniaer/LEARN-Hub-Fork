@@ -139,28 +139,6 @@ public class ActivityController {
 		}
 	}
 
-	@PostMapping("/upload-and-create")
-	@PreAuthorize("hasRole('ADMIN')")
-	@SecurityRequirement(name = "BearerAuth")
-	@Operation(summary = "Upload PDF and create activity", description = "Upload PDF, extract data, and create activity in one step (admin only)")
-	public ResponseEntity<?> uploadAndCreateActivity(@RequestParam("pdf_file") MultipartFile pdfFile) {
-		logger.info("POST /api/activities/upload-and-create - Upload and create activity called with file={}",
-				pdfFile.getOriginalFilename());
-		try {
-			Map<String, Object> response = activityService.uploadAndCreateActivity(pdfFile);
-			logger.info("POST /api/activities/upload-and-create - Activity created from PDF successfully");
-			return ResponseEntity.status(201).body(response);
-		} catch (IllegalArgumentException e) {
-			logger.error("POST /api/activities/upload-and-create - Invalid input: {}", e.getMessage());
-			return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
-		} catch (Exception e) {
-			logger.error("POST /api/activities/upload-and-create - Failed to upload and create activity: {}",
-					e.getMessage());
-			return ResponseEntity.status(500)
-					.body(ErrorResponse.of("Failed to upload and create activity: " + e.getMessage()));
-		}
-	}
-
 	@GetMapping("/{activityId}/pdf")
 	@PreAuthorize("permitAll()")
 	@Operation(summary = "Get activity PDF", description = "Get PDF file for a specific activity")

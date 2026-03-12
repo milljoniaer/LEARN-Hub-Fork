@@ -10,8 +10,6 @@ import type {
   FieldValues,
 } from "@/types/activity";
 import type {
-  PdfProcessingResponse,
-  UploadCreateResponse,
   UploadPdfDraftResponse,
   ArtikulationsschemaResponse,
   CreateActivityRequest,
@@ -274,41 +272,6 @@ export class ApiService {
   }
 
   /**
-   * Upload PDF
-   */
-  static async uploadPdf(file: File) {
-    const formData = new FormData();
-    formData.append("pdf_file", file);
-
-    return this.request("/api/documents/upload_pdf", {
-      method: "POST",
-      body: formData,
-    });
-  }
-
-  /**
-   * Get PDF info
-   */
-  static async getPdfInfo(documentId: string) {
-    return this.request(`/api/documents/${documentId}/info`);
-  }
-
-  /**
-   * Download PDF
-   */
-  static async downloadPdf(documentId: string) {
-    const response = await authService.makeAuthenticatedRequest(
-      `/api/documents/${documentId}`,
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.blob();
-  }
-
-  /**
    * Create activity
    */
   static async createActivity(data: CreateActivityRequest) {
@@ -393,53 +356,10 @@ export class ApiService {
   }
 
   /**
-   * Get PDF by document ID
-   */
-  static async getDocumentPdf(documentId: string) {
-    const response = await authService.makeAuthenticatedRequest(
-      `/api/documents/${documentId}`,
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return response.blob();
-  }
-
-  /**
    * Get PDF document info by document ID
    */
   static async getDocumentInfo(documentId: string) {
     return this.request<Document>(`/api/documents/${documentId}/info`);
-  }
-
-  /**
-   * Process PDF document and extract activity data
-   */
-  static async processPdf(documentId: string) {
-    return this.request<PdfProcessingResponse>(
-      `/api/documents/${documentId}/process`,
-      {
-        method: "POST",
-      },
-    );
-  }
-
-  /**
-   * Upload PDF and create activity in one step
-   */
-  static async uploadAndCreateActivity(file: File) {
-    const formData = new FormData();
-    formData.append("pdf_file", file);
-
-    return this.request<UploadCreateResponse>(
-      "/api/activities/upload-and-create",
-      {
-        method: "POST",
-        body: formData,
-      },
-    );
   }
 
   /**
