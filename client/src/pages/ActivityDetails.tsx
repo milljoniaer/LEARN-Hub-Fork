@@ -5,9 +5,10 @@ import { LoadingState, SkeletonGrid } from "@/components/ui/LoadingState";
 import { ErrorDisplay } from "@/components/ui/ErrorDisplay";
 import { useDataFetch } from "@/hooks/useDataFetch";
 import { useApi } from "@/hooks/useApi";
-import { Brain, Activity as ActivityIcon, FileText, BookOpen } from "lucide-react";
+import { Brain, Activity as ActivityIcon, FileText, BookOpen, Edit3 } from "lucide-react";
 import { FavouriteButton } from "@/components/favourites/FavouriteButton";
 import { apiService } from "@/services/apiService";
+import { useAuth } from "@/hooks/useAuth";
 import type { Activity } from "@/types/activity";
 
 // Note: PDFInfo interface is defined but not currently used in the refactored version
@@ -17,6 +18,8 @@ export const ActivityDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
 
   // Get activity data from navigation state or fetch from API
   const stateActivity = location.state?.activity as Activity | undefined;
@@ -174,6 +177,16 @@ export const ActivityDetails: React.FC = () => {
           </div>
           <div className="flex gap-2 sm:gap-4">
             <FavouriteButton activityId={activity.id} size="default" />
+            {isAdmin && (
+              <Button
+                onClick={() => navigate(`/activity-edit/${activity.id}`)}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Edit3 className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
             <Button
               onClick={handleDownloadPDF}
               disabled={downloadApi.isLoading}

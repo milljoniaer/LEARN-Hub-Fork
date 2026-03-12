@@ -176,9 +176,20 @@ public class ActivityService {
 		activity.setCleanupTimeMinutes(activityUpdate.getCleanupTimeMinutes());
 		activity.setResourcesNeeded(activityUpdate.getResourcesNeeded());
 		activity.setTopics(activityUpdate.getTopics());
+		activity.setArtikulationsschemaMarkdown(activityUpdate.getArtikulationsschemaMarkdown());
 
 		Activity saved = activityRepository.save(activity);
 		return mapToResponse(saved);
+	}
+
+	/**
+	 * Update activity from a Map payload (used by the PUT endpoint).
+	 * Re-uses createActivityFromMap to parse the request, then applies to the
+	 * existing entity.
+	 */
+	public ActivityResponse updateActivityFromMap(UUID id, Map<String, Object> request) {
+		Activity activityUpdate = createActivityFromMap(request);
+		return updateActivity(id, activityUpdate);
 	}
 
 	public void deleteActivity(UUID id) {

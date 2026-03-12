@@ -13,6 +13,7 @@ import type {
   UploadPdfDraftResponse,
   ArtikulationsschemaResponse,
   CreateActivityRequest,
+  UpdateActivityRequest,
   UserRequest,
   FavoriteActivityRequest,
   FavoriteLessonPlanRequest,
@@ -288,6 +289,17 @@ export class ApiService {
   static async deleteActivity(activityId: string) {
     return this.request(`/api/activities/${activityId}`, {
       method: "DELETE",
+    });
+  }
+
+  /**
+   * Update activity (admin only)
+   */
+  static async updateActivity(activityId: string, data: UpdateActivityRequest) {
+    return this.request<Activity>(`/api/activities/${activityId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
   }
 

@@ -67,6 +67,26 @@ export interface CreateActivityRequest {
   artikulationsschema_markdown?: string;
 }
 
+// Activity update request
+export interface UpdateActivityRequest {
+  name: string;
+  description: string;
+  source?: string;
+  age_min: number;
+  age_max: number;
+  format: string;
+  resources_needed: string[];
+  bloom_level: string;
+  duration_min_minutes: number;
+  duration_max_minutes?: number;
+  prep_time_minutes?: number;
+  cleanup_time_minutes?: number;
+  mental_load?: string;
+  physical_energy?: string;
+  topics: string[];
+  artikulationsschema_markdown?: string;
+}
+
 // User creation/update request
 export interface UserRequest {
   email: string;

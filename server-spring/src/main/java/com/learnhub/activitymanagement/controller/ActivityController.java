@@ -139,6 +139,30 @@ public class ActivityController {
 		}
 	}
 
+	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	@SecurityRequirement(name = "BearerAuth")
+	@Operation(summary = "Update activity", description = "Update an existing activity's metadata and artikulationsschema (admin only)")
+	public ResponseEntity<?> updateActivity(@PathVariable UUID id, @RequestBody Map<String, Object> request) {
+		logger.info("PUT /api/activities/{} - Update activity called", id);
+		try {
+			ActivityResponse updated = activityService.updateActivityFromMap(id, request);
+			logger.info("PUT /api/activities/{} - Activity updated successfully", id);
+			return ResponseEntity.ok(updated);
+		} catch (IllegalArgumentException e) {
+			logger.error("PUT /api/activities/{} - Invalid activity data: {}", id, e.getMessage());
+			return ResponseEntity.badRequest().body(ErrorResponse.of(e.getMessage()));
+		} catch (Exception e) {
+			String msg = e.getMessage();
+			if (msg != null && msg.contains("Activity not found")) {
+				logger.error("PUT /api/activities/{} - Activity not found: {}", id, msg);
+				return ResponseEntity.status(404).body(ErrorResponse.of(msg));
+			}
+			logger.error("PUT /api/activities/{} - Failed to update activity: {}", id, msg);
+			return ResponseEntity.status(500).body(ErrorResponse.of("Failed to update activity: " + msg));
+		}
+	}
+
 	@GetMapping("/{activityId}/pdf")
 	@PreAuthorize("permitAll()")
 	@Operation(summary = "Get activity PDF", description = "Get PDF file for a specific activity")
